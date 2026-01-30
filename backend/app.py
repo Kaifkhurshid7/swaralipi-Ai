@@ -1,12 +1,17 @@
 import os
+import sys
+from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
-from .inference.detector import detect_swaras_from_bytes
-from .mapping.swara_map import map_swara_to_num
-from .database import save_scan, get_history
-from .schemas import DetectResponse, Detection
+# Add the backend directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+from inference.detector import detect_swaras_from_bytes
+from mapping.swara_map import map_swara_to_num
+from database import save_scan, get_history
+from schemas import DetectResponse, Detection
 
 app = FastAPI(title='Swaralipi Detection API')
 
