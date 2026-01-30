@@ -12,6 +12,12 @@ export default {
                 primary: '#000000',
                 secondary: '#666666',
                 accent: '#333333',
+            },
+            spacing: {
+                'safe-area-top': 'env(safe-area-inset-top)',
+                'safe-area-bottom': 'env(safe-area-inset-bottom)',
+                'safe-area-left': 'env(safe-area-inset-left)',
+                'safe-area-right': 'env(safe-area-inset-right)',
             }
         },
     },
