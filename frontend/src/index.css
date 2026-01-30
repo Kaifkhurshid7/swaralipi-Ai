@@ -11,14 +11,14 @@
 
 @layer components {
   .btn-primary {
-    @apply block w-full py-4 px-6 bg-primary hover:bg-accent text-background font-bold rounded-xl transition-colors text-center text-lg shadow-lg;
+    @apply block w-full py-4 px-6 bg-black hover:bg-gray-800 text-white font-bold rounded-xl transition-all text-center text-lg shadow-lg hover:shadow-xl;
   }
   
   .btn-secondary {
-    @apply block w-full py-4 px-6 bg-transparent border-2 border-secondary hover:border-white text-secondary hover:text-white font-bold rounded-xl transition-all text-center text-lg;
+    @apply block w-full py-4 px-6 bg-gray-100 border-2 border-gray-300 hover:border-black text-black hover:bg-gray-200 font-bold rounded-xl transition-all text-center text-lg;
   }
 
   .card {
-    @apply bg-surface border border-white/5 rounded-2xl p-6 shadow-xl;
+    @apply bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow;
   }
 }
