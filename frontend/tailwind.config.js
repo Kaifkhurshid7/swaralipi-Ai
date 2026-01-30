@@ -8,9 +8,9 @@ export default {
         extend: {
             colors: {
                 background: '#ffffff',
-                surface: '#f5f5f5',
+                surface: '#f9fafb',
                 primary: '#000000',
-                secondary: '#666666',
+                secondary: '#6b7280',
                 accent: '#333333',
             },
             spacing: {
