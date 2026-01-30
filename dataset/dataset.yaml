@@ -1,0 +1,5 @@
+path: ../dataset
+train: images
+val: images
+nc: 7
+names: ['Sa','Re','Ga','Ma','Pa','Dha','Ni']
