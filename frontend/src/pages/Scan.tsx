@@ -97,12 +97,12 @@ const Scan: React.FC = () => {
         </div>
 
         {/* Guidance Section */}
-        <div className="mt-10 space-y-4">
+        {/* <div className="mt-10 space-y-4">
           <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-50 bg-gray-50/50">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <p className="text-xs font-bold text-gray-600 tracking-tight">AI Engine Ready: YOLOv8 Inference</p>
           </div>
-        </div>
+        </div> */}
 
         {/* Footer Action */}
         <div className="fixed bottom-0 left-0 right-0 p-8 bg-white/80 backdrop-blur-md">
@@ -110,7 +110,7 @@ const Scan: React.FC = () => {
             onClick={() => fileRef.current?.click()}
             className="w-full bg-black text-white py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-[0.98] transition-all"
           >
-            Launch Camera
+            Click to Upload
           </button>
           <p className="text-center mt-4 text-[9px] font-bold text-gray-300 uppercase tracking-widest">
             Supports High-Res JPG & PNG
