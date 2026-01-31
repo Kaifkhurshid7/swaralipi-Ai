@@ -1,12 +1,4 @@
 SWARA_TO_NUM = {
-    'Sa': 1,
-    'Re': 2,
-    'Ga': 3,
-    'Ma': 4,
-    'Pa': 5,
-    'Dha': 6,
-    'Ni': 7,
-    # common lowercase / alternate labels
     'sa': 1,
     're': 2,
     'ga': 3,
@@ -17,4 +9,8 @@ SWARA_TO_NUM = {
 }
 
 def map_swara_to_num(label: str) -> int:
-    return SWARA_TO_NUM.get(label, -1)
+    # Clean the label (e.g., "Dha(dot above)" -> "dha")
+    # Take the part before any bracket or number
+    import re
+    cleaned = re.split(r'\(|\d', label)[0].lower().strip()
+    return SWARA_TO_NUM.get(cleaned, -1)

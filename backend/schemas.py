@@ -14,6 +14,8 @@ class DetectResponse(BaseModel):
     ordered_labels: List[str]
     numeric_sequence: List[int]
     overall_confidence: float
+    timestamp: str | None = None
+    model_info: str | None = None
 
 
 class ScanRecord(BaseModel):

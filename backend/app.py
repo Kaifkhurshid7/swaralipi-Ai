@@ -8,10 +8,14 @@ from typing import List
 # Add the backend directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from inference.detector import detect_swaras_from_bytes
 from mapping.swara_map import map_swara_to_num
 from database import save_scan, get_history
 from schemas import DetectResponse, Detection
+from inference.detector import get_detector
+
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title='Swaralipi Detection API')
 
@@ -23,13 +27,27 @@ app.add_middleware(
 )
 
 
+@app.get('/health')
+def health():
+    detector = get_detector()
+    return {
+        "status": "healthy",
+        "model_loaded": detector.model is not None,
+        "model_path": detector.model_path
+    }
+
+
 @app.post('/detect', response_model=DetectResponse)
 async def detect(file: UploadFile = File(...), confidence: float = 0.3):
     content = await file.read()
     try:
-        detections = detect_swaras_from_bytes(content, confidence_threshold=confidence)
+        detector = get_detector()
+        detections = detector.detect_from_bytes(content, confidence_threshold=confidence)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Detection failed: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Backend Analysis Failed. Check server logs.")
 
     ordered_labels = [d['label'] for d in detections]
     numeric_sequence = [map_swara_to_num(lbl) for lbl in ordered_labels]
@@ -40,8 +58,15 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
         det = Detection(label=d['label'], score=d['score'], bbox=d['bbox'], numeric=num)
         det_objs.append(det)
 
-    response = DetectResponse(detections=det_objs, ordered_labels=ordered_labels,
-                              numeric_sequence=numeric_sequence, overall_confidence=overall_confidence)
+    from datetime import datetime
+    response = DetectResponse(
+        detections=det_objs, 
+        ordered_labels=ordered_labels,
+        numeric_sequence=numeric_sequence, 
+        overall_confidence=overall_confidence,
+        timestamp=datetime.utcnow().isoformat() + 'Z',
+        model_info="YOLOv8-Swaralipi-Detector"
+    )
 
     # persist
     try:
