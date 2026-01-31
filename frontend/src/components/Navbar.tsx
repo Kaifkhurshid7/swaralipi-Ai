@@ -46,16 +46,22 @@ const Navbar: React.FC = () => {
     <>
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 h-16 flex items-center px-6">
         <div className="flex items-center justify-between w-full max-w-md mx-auto">
-
-          {/* Minimalist Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 bg-black rounded-xl flex items-center justify-center shadow-lg group-active:scale-95 transition-transform">
-              <div className="w-3 h-3 border-2 border-white rounded-full" />
-            </div>
-            <span className="font-black tracking-tighter text-lg italic">
-              S<span className="text-gray-300 not-italic">L</span>
-            </span>
-          </Link>
+          <div className="flex items-center justify-center">
+            <svg
+              viewBox="0 0 24 24"
+              className="w-8 h-8 text-black transition-transform duration-300 hover:scale-110 active:opacity-70"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              {/* Clean double-stem musical note with no extra background or scan lines */}
+              <path d="M9 18V5l10 2v12" />
+              <circle cx="6" cy="18" r="3" />
+              <circle cx="16" cy="19" r="3" />
+            </svg>
+          </div>
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
