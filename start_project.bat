@@ -4,8 +4,12 @@ echo    Swaralipi AI - Starter Script
 echo ==========================================
 
 :: Backend Setup and Start
-echo starting Backend...
-start cmd /k "echo Initializing Backend... && pip install -r requirements.txt && python backend/app.py"
+echo Starting Backend...
+if exist ".venv\Scripts\python.exe" (
+    start cmd /k "echo Using Virtual Environment... && .venv\Scripts\python.exe -m pip install -r requirements.txt && .venv\Scripts\python.exe backend/app.py"
+) else (
+    start cmd /k "echo Starting Backend... && pip install -r requirements.txt && python backend/app.py"
+)
 
 :: Frontend Setup and Start
 echo Starting Frontend...

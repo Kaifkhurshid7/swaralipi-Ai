@@ -25,69 +25,108 @@ const Scan: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container-mobile bg-gradient-to-b from-background to-surface">
+      <div className="min-h-screen bg-white">
         <Navbar />
-        <div className="content-area flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin mb-6 mx-auto"></div>
-            <h2 className="text-2xl font-bold text-black mb-2">Analyzing Swaralipi...</h2>
-            <p className="text-secondary text-sm">Detecting swaras and mapping numeric values.</p>
+        <div className="flex flex-col items-center justify-center h-[80vh] px-8 text-center">
+          <div className="relative w-24 h-24 mb-8">
+            {/* Minimalist Scanner Animation */}
+            <div className="absolute inset-0 border-2 border-gray-100 rounded-2xl"></div>
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-black animate-scan-line"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-4 h-4 bg-black rounded-full animate-pulse"></div>
+            </div>
           </div>
+          <h2 className="text-xl font-black tracking-tighter italic mb-2 uppercase">Analyzing</h2>
+          <p className="text-gray-400 text-[11px] font-bold uppercase tracking-[0.2em]">
+            Detecting Swaras • Mapping Sequence
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container-mobile bg-gradient-to-b from-background to-surface">
+    <div className="min-h-screen bg-white text-black font-sans">
       <Navbar />
-      <div className="content-area bg-background">
-        <header className="px-4 sm:px-6 py-4 sm:py-6 flex items-center justify-between sticky top-0 bg-white border-b border-gray-200 z-10">
-          <button onClick={() => navigate(-1)} className="text-secondary hover:text-black transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-7 sm:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+      <main className="max-w-md mx-auto px-6 pt-8 pb-32">
+        <header className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-100 hover:bg-gray-50 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h2 className="text-lg sm:text-xl font-bold text-black">New Scan</h2>
-          <div className="w-6 sm:w-7"></div>
+          <h2 className="text-xl font-black tracking-tighter italic">SCANNER</h2>
+          <div className="w-10"></div>
         </header>
 
-        <div className="flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
-          <div 
-            className="w-full aspect-[4/5] border-2 border-dashed border-gray-300 rounded-3xl flex flex-col items-center justify-center overflow-hidden relative group cursor-pointer hover:border-black transition-colors bg-white"
-            onClick={() => fileRef.current?.click()}
-          >
-            <div className="absolute inset-0 border-4 border-black/10 m-6 rounded-2xl pointer-events-none"></div>
+        {/* Viewfinder Area */}
+        <div
+          onClick={() => fileRef.current?.click()}
+          className="relative group cursor-pointer active:scale-[0.98] transition-all"
+        >
+          {/* Corner Brackets for Viewfinder */}
+          <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-black rounded-tl-xl z-10"></div>
+          <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-black rounded-tr-xl z-10"></div>
+          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-black rounded-bl-xl z-10"></div>
+          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-black rounded-br-xl z-10"></div>
 
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 sm:h-20 sm:w-20 text-black mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-
-            <p className="text-center px-6 sm:px-8 text-secondary text-sm sm:text-base font-medium">
-              Align Swaralipi notations within the frame and capture
+          <div className="w-full aspect-[3/4] bg-gray-50 rounded-2xl flex flex-col items-center justify-center overflow-hidden border border-gray-100">
+            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm mb-6 group-hover:scale-110 transition-transform duration-500">
+              <svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <circle cx="12" cy="13" r="3" strokeWidth={1.5} />
+              </svg>
+            </div>
+            <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 max-w-[200px] text-center leading-relaxed px-4">
+              Place notation book within frame for optimal detection
             </p>
+          </div>
 
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={onPick}
-            />
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={onPick}
+          />
+        </div>
+
+        {/* Guidance Section */}
+        <div className="mt-10 space-y-4">
+          <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-50 bg-gray-50/50">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <p className="text-xs font-bold text-gray-600 tracking-tight">AI Engine Ready: YOLOv8 Inference</p>
           </div>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 px-4 sm:px-6 py-4 sm:py-6 bg-white border-t border-gray-200 space-y-3 safe-area-bottom">
-          <button onClick={() => fileRef.current?.click()} className="btn-primary py-3 sm:py-4 font-bold">
-            Open Camera
+        {/* Footer Action */}
+        <div className="fixed bottom-0 left-0 right-0 p-8 bg-white/80 backdrop-blur-md">
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="w-full bg-black text-white py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-[0.98] transition-all"
+          >
+            Launch Camera
           </button>
-          <p className="text-center text-secondary text-xs sm:text-sm">
-            Supports JPG, PNG images from gallery or direct capture
+          <p className="text-center mt-4 text-[9px] font-bold text-gray-300 uppercase tracking-widest">
+            Supports High-Res JPG & PNG
           </p>
         </div>
-      </div>
+      </main>
+
+      <style>{`
+        @keyframes scan-line {
+          0% { top: 0% }
+          100% { top: 100% }
+        }
+        .animate-scan-line {
+          animation: scan-line 2s linear infinite;
+        }
+      `}</style>
     </div>
   );
 };
