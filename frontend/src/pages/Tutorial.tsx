@@ -3,75 +3,75 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
 const swaras = [
-  { 
-    name: 'Sa', 
-    numeric: 1, 
-    full: 'Shadja', 
-    color: '#14b8a6',
-    description: 'The foundational swara, equivalent to Do in Western music',
-    meaning: 'Derived from "Sha" (six), as it is the origin of six other notes',
-    frequency: 'Base frequency - typically 261.63 Hz (C)',
-    variations: ['Sa', 'S']
+  {
+    name: 'Sa',
+    numeric: 1,
+    full: 'Shadja',
+    description: 'The root. The foundational swara equivalent to Do in Western Solfège.',
+    meaning: 'Origin of the six other notes.',
+    frequency: '261.63 Hz (C)',
+    variants: ['Shuddha (Natural)'],
+    symbol: 'S'
   },
-  { 
-    name: 'Re', 
-    numeric: 2, 
-    full: 'Rishabha', 
-    color: '#0f766e',
-    description: 'The second swara with two variants - Komal and Shuddha',
-    meaning: 'Means "brightness" or "sharpness" in Sanskrit',
-    frequency: 'Komal Re: ~277.18 Hz, Shuddha Re: ~293.66 Hz',
-    variations: ['Re', 'R', 'Ri']
+  {
+    name: 'Re',
+    numeric: 2,
+    full: 'Rishabha',
+    description: 'The second swara. Influences the emotional gravity of a Raga.',
+    meaning: 'Brightness or sharpness.',
+    frequency: 'Komal: 277.18 Hz | Shuddha: 293.66 Hz',
+    variants: ['Komal (Flat)', 'Shuddha (Natural)'],
+    symbol: 'R'
   },
-  { 
-    name: 'Ga', 
-    numeric: 3, 
-    full: 'Gandhara', 
-    color: '#134e4a',
-    description: 'The third swara, also has Komal and Shuddha variants',
-    meaning: 'Associated with fragrance and sweetness',
-    frequency: 'Komal Ga: ~311.13 Hz, Shuddha Ga: ~329.63 Hz',
-    variations: ['Ga', 'G']
+  {
+    name: 'Ga',
+    numeric: 3,
+    full: 'Gandhara',
+    description: 'The third swara. Often associated with sweetness and grace.',
+    meaning: 'The fragrance of sound.',
+    frequency: 'Komal: 311.13 Hz | Shuddha: 329.63 Hz',
+    variants: ['Komal (Flat)', 'Shuddha (Natural)'],
+    symbol: 'G'
   },
-  { 
-    name: 'Ma', 
-    numeric: 4, 
-    full: 'Madhyama', 
-    color: '#2dd4bf',
-    description: 'The middle swara with important Teevra (sharp) variant',
-    meaning: 'Means "middle" - the central note in the octave',
-    frequency: 'Shuddha Ma: ~349.23 Hz, Teevra Ma: ~370.00 Hz',
-    variations: ['Ma', 'M']
+  {
+    name: 'Ma',
+    numeric: 4,
+    full: 'Madhyama',
+    description: 'The central note. Acts as a bridge between the lower and upper notes.',
+    meaning: 'The Middle.',
+    frequency: 'Shuddha: 349.23 Hz | Teevra: 370.00 Hz',
+    variants: ['Shuddha (Natural)', 'Teevra (Sharp)'],
+    symbol: 'M'
   },
-  { 
-    name: 'Pa', 
-    numeric: 5, 
-    full: 'Panchama', 
-    color: '#5eead4',
-    description: 'The perfect fifth - considered the most important after Sa',
-    meaning: 'Means "fifth" in Sanskrit',
-    frequency: '~392.00 Hz (G)',
-    variations: ['Pa', 'P']
+  {
+    name: 'Pa',
+    numeric: 5,
+    full: 'Panchama',
+    description: 'The perfect fifth. Immutable and constant, providing stability.',
+    meaning: 'The Fifth.',
+    frequency: '392.00 Hz (G)',
+    variants: ['Shuddha (Natural)'],
+    symbol: 'P'
   },
-  { 
-    name: 'Dha', 
-    numeric: 6, 
-    full: 'Dhaivata', 
-    color: '#99f6e4',
-    description: 'The sixth swara with Komal and Shuddha variants',
-    meaning: 'Associated with divine quality',
-    frequency: 'Komal Dha: ~415.30 Hz, Shuddha Dha: ~440.00 Hz',
-    variations: ['Dha', 'D']
+  {
+    name: 'Dha',
+    numeric: 6,
+    full: 'Dhaivata',
+    description: 'The sixth swara. Adds divine and spiritual depth.',
+    meaning: 'Divine Quality.',
+    frequency: 'Komal: 415.30 Hz | Shuddha: 440.00 Hz',
+    variants: ['Komal (Flat)', 'Shuddha (Natural)'],
+    symbol: 'D'
   },
-  { 
-    name: 'Ni', 
-    numeric: 7, 
-    full: 'Nishada', 
-    color: '#ccfbf1',
-    description: 'The seventh swara with Komal and Shuddha variants',
-    meaning: 'Associated with the lowest or subordinate note',
-    frequency: 'Komal Ni: ~466.16 Hz, Shuddha Ni: ~493.88 Hz',
-    variations: ['Ni', 'N']
+  {
+    name: 'Ni',
+    numeric: 7,
+    full: 'Nishada',
+    description: 'The leading tone. Often used to create tension before returning to Sa.',
+    meaning: 'Subordinate or Final.',
+    frequency: 'Komal: 466.16 Hz | Shuddha: 493.88 Hz',
+    variants: ['Komal (Flat)', 'Shuddha (Natural)'],
+    symbol: 'N'
   },
 ];
 
@@ -80,125 +80,125 @@ const Tutorial: React.FC = () => {
   const [expandedSwara, setExpandedSwara] = useState<string | null>(null);
 
   return (
-    <div className="container-mobile bg-gradient-to-b from-background to-surface">
+    <div className="min-h-screen bg-white text-black font-sans">
       <Navbar />
-      
-      <div className="content-area bg-background">
-        <header className="px-4 sm:px-6 py-4 sm:py-6 flex items-center justify-between sticky top-0 bg-white border-b border-gray-200 z-10">
-          <button onClick={() => navigate(-1)} className="text-secondary hover:text-black transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-7 sm:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+      <main className="max-w-md mx-auto px-6 pt-8 pb-40">
+        {/* Page Header */}
+        <header className="flex items-center justify-between mb-10">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-100 hover:bg-gray-50 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h2 className="text-lg sm:text-xl font-bold text-black">Learn Swaras</h2>
-          <div className="w-6 sm:w-7"></div>
+          <h2 className="text-xl font-black tracking-tighter italic uppercase">Learn</h2>
+          <div className="w-10"></div>
         </header>
 
-        <section className="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-100">
-          <p className="text-secondary text-sm sm:text-base leading-relaxed">
-            Indian classical music uses seven fundamental swaras. Each swara has unique qualities, frequencies, and variations (Komal/Flat, Shuddha/Natural, Teevra/Sharp).
+        {/* Intro Section */}
+        <section className="mb-12">
+          <h1 className="text-4xl font-black tracking-tighter italic leading-tight mb-4">
+            The Geometry <br />of Sound
+          </h1>
+          <p className="text-gray-400 text-sm font-medium leading-relaxed">
+            Swaralipi AI maps traditional Indian classical notations into a digital numeric system.
+            Understand the 7 fundamental Swaras that form the core of every Raga.
           </p>
-          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-xs sm:text-sm text-blue-900">
-              <strong>Total Variations:</strong> 7 basic swaras × multiple variations = up to 36+ notations in advanced raga systems
+        </section>
+
+        {/* Interactive Mapping Grid */}
+        <div className="space-y-4">
+          {swaras.map((s) => (
+            <div
+              key={s.name}
+              className={`group border-b border-gray-100 transition-all duration-500 ${expandedSwara === s.name ? 'pb-8' : 'pb-4'}`}
+            >
+              <button
+                onClick={() => setExpandedSwara(expandedSwara === s.name ? null : s.name)}
+                className="w-full flex items-center justify-between py-2 text-left"
+              >
+                <div className="flex items-center gap-6">
+                  <span className="text-5xl font-black italic tracking-tighter text-gray-100 group-hover:text-black transition-colors">
+                    0{s.numeric}
+                  </span>
+                  <div>
+                    <h3 className="text-xl font-black tracking-tight">{s.name}</h3>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{s.full}</p>
+                  </div>
+                </div>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center border border-gray-100 transition-transform duration-500 ${expandedSwara === s.name ? 'rotate-180 bg-black text-white' : ''}`}>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+
+              {/* Vast Detail Expansion */}
+              {expandedSwara === s.name && (
+                <div className="mt-6 grid grid-cols-1 gap-6 animate-in fade-in slide-in-from-top-4">
+                  <div className="p-6 bg-gray-50 rounded-3xl">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Detailed Theory</p>
+                    <p className="text-sm font-medium leading-relaxed text-gray-800">{s.description}</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 border border-gray-100 rounded-2xl">
+                      <p className="text-[9px] font-black uppercase tracking-tighter text-gray-400 mb-1">Frequency</p>
+                      <p className="text-xs font-black italic">{s.frequency}</p>
+                    </div>
+                    <div className="p-4 border border-gray-100 rounded-2xl">
+                      <p className="text-[9px] font-black uppercase tracking-tighter text-gray-400 mb-1">Etymology</p>
+                      <p className="text-xs font-black italic">{s.meaning}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">AI Recognized Variations</p>
+                    <div className="flex flex-wrap gap-2">
+                      {s.variants.map((v) => (
+                        <span key={v} className="px-4 py-2 bg-black text-white rounded-full text-[10px] font-black uppercase tracking-widest">
+                          {v}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Vast Mapping Context */}
+        <section className="mt-16 p-8 bg-black rounded-[2.5rem] text-white">
+          <h4 className="text-[10px] font-black uppercase tracking-[0.3em] mb-6 opacity-50">Mapping Infrastructure</h4>
+          <div className="space-y-6">
+            <div className="flex justify-between items-start border-b border-white/10 pb-4">
+              <span className="text-2xl font-black italic italic">12</span>
+              <p className="text-[11px] font-bold text-right max-w-[150px] leading-tight">Semi-tones in a standard octave recognized by our YOLOv8 model.</p>
+            </div>
+            <div className="flex justify-between items-start border-b border-white/10 pb-4">
+              <span className="text-2xl font-black italic italic">36</span>
+              <p className="text-[11px] font-bold text-right max-w-[150px] leading-tight">Advanced micro-tonal variations mapped for specific Gharana styles.</p>
+            </div>
+            <p className="text-[10px] text-gray-500 font-medium leading-relaxed pt-2 italic">
+              * The numeric mapping (1-7) follows the Shuddha scale as the baseline for digital recognition.
             </p>
           </div>
         </section>
 
-        <div className="px-4 sm:px-6 pb-24 pt-4">
-          <div className="grid grid-cols-1 gap-3 sm:gap-4">
-            {swaras.map((s) => (
-              <div key={s.name} className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md transition-all">
-                {/* Header */}
-                <button
-                  onClick={() => setExpandedSwara(expandedSwara === s.name ? null : s.name)}
-                  className="w-full flex items-center p-4 sm:p-5 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center bg-black rounded-xl text-white text-2xl sm:text-3xl font-black mr-4 sm:mr-6 flex-shrink-0">
-                    {s.name}
-                  </div>
-                  <div className="flex-1 min-w-0 text-left">
-                    <h4 className="font-bold text-black text-sm sm:text-base">{s.full}</h4>
-                    <p className="text-secondary text-xs sm:text-sm">Numeric: <span className="text-black font-mono font-bold">{s.numeric}</span></p>
-                  </div>
-                  <div className="text-gray-400 flex-shrink-0 ml-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${expandedSwara === s.name ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-                </button>
-
-                {/* Expanded Details */}
-                {expandedSwara === s.name && (
-                  <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-gray-100 bg-gray-50 space-y-3 sm:space-y-4">
-                    <div>
-                      <p className="text-xs font-bold text-secondary uppercase tracking-wide">Description</p>
-                      <p className="text-sm text-black leading-relaxed mt-1">{s.description}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs font-bold text-secondary uppercase tracking-wide">Meaning</p>
-                      <p className="text-sm text-black leading-relaxed mt-1">{s.meaning}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs font-bold text-secondary uppercase tracking-wide">Frequency</p>
-                      <p className="text-sm text-black font-mono mt-1">{s.frequency}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs font-bold text-secondary uppercase tracking-wide">Notations & Variations</p>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {s.variations.map((v) => (
-                          <span key={v} className="px-3 py-1 bg-white border border-gray-300 rounded-full text-xs font-medium text-black">
-                            {v}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Additional Info for variants */}
-                    {(s.numeric === 2 || s.numeric === 3 || s.numeric === 4 || s.numeric === 6 || s.numeric === 7) && (
-                      <div>
-                        <p className="text-xs font-bold text-secondary uppercase tracking-wide">Variants Info</p>
-                        <div className="text-xs text-black mt-2 space-y-1 p-2 bg-white border border-gray-200 rounded">
-                          {s.numeric === 2 && <p>• <strong>Komal Re (♭):</strong> Flat variant, more somber tone</p>}
-                          {s.numeric === 2 && <p>• <strong>Shuddha Re:</strong> Natural variant, bright tone</p>}
-                          {s.numeric === 3 && <p>• <strong>Komal Ga (♭):</strong> Flat variant, soft quality</p>}
-                          {s.numeric === 3 && <p>• <strong>Shuddha Ga:</strong> Natural variant</p>}
-                          {s.numeric === 4 && <p>• <strong>Shuddha Ma:</strong> Natural perfect fourth</p>}
-                          {s.numeric === 4 && <p>• <strong>Teevra Ma (♯):</strong> Sharp variant, raised fourth</p>}
-                          {s.numeric === 6 && <p>• <strong>Komal Dha (♭):</strong> Flat variant</p>}
-                          {s.numeric === 6 && <p>• <strong>Shuddha Dha:</strong> Natural variant</p>}
-                          {s.numeric === 7 && <p>• <strong>Komal Ni (♭):</strong> Flat variant</p>}
-                          {s.numeric === 7 && <p>• <strong>Shuddha Ni:</strong> Natural variant</p>}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Summary Section */}
-          <div className="mt-8 p-4 sm:p-6 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl border border-teal-200">
-            <h3 className="font-bold text-black text-sm sm:text-base mb-3">Complete 36 Notations Overview</h3>
-            <div className="text-xs sm:text-sm text-gray-700 space-y-2">
-              <p><strong>Base Swaras:</strong> Sa, Re, Ga, Ma, Pa, Dha, Ni (7 notes)</p>
-              <p><strong>Variations:</strong> Each swara can have Komal (♭), Shuddha (Natural), and some have Teevra (♯) variants</p>
-              <p><strong>Total Combinations:</strong> Sa (1) + Re (2) + Ga (2) + Ma (2) + Pa (1) + Dha (2) + Ni (2) = 12 basic + advanced raga-specific combinations up to 36</p>
-              <p className="mt-2 text-xs text-teal-900 bg-white p-2 rounded">
-                💡 Ragas use specific combinations of these swaras to create unique melodic frameworks
-              </p>
-            </div>
-          </div>
+        {/* Floating Action Button */}
+        <div className="fixed bottom-10 left-0 right-0 px-8 flex justify-center pointer-events-none">
+          <button
+            onClick={() => navigate('/scan')}
+            className="pointer-events-auto bg-black text-white w-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all"
+          >
+            Launch Recognition
+          </button>
         </div>
-
-        <footer className="fixed bottom-0 left-0 right-0 p-4 sm:p-6 bg-white border-t border-gray-200 safe-area-bottom">
-          <button onClick={() => navigate('/scan')} className="btn-primary py-3 sm:py-4">Start Scanning</button>
-        </footer>
-      </div>
+      </main>
     </div>
   );
 };
