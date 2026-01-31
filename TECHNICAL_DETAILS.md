@@ -1,8 +1,5 @@
 # Swaralipi AI - Technical Architecture & Methodology
 
-This document provides an in-depth explanation of the technologies, algorithms, and logic used in the Swaralipi AI project.
-
----
 
 ## 1. Deep Learning Architecture: YOLOv8
 The core of the system is based on **YOLOv8 (You Only Look Once version 8)**, a state-of-the-art Deep Learning model for real-time object detection.
