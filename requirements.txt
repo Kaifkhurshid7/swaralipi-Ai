@@ -1,6 +1,7 @@
-fastapi==0.95.2
-uvicorn[standard]==0.22.0
-numpy==1.26.0
-opencv-python==4.8.1.78
-ultralytics==8.0.196
-pydantic==1.10.12
+fastapi>=0.100.0
+uvicorn[standard]>=0.22.0
+numpy>=1.26.0
+opencv-python>=4.8.1.78
+ultralytics>=8.0.196
+pydantic>=2.0.0
+typing-extensions>=4.8.0

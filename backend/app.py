@@ -70,7 +70,7 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
 
     # persist
     try:
-        save_scan(response.dict())
+        save_scan(response.model_dump())
     except Exception:
         # non-fatal
         pass
