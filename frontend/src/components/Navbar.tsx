@@ -46,7 +46,7 @@ const Navbar: React.FC = () => {
     <>
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 h-16 flex items-center px-6">
         <div className="flex items-center justify-between w-full max-w-md mx-auto">
-          <div className="flex items-center justify-center">
+          <Link to="/" className="flex items-center justify-center">
             <svg
               viewBox="0 0 24 24"
               className="w-8 h-8 text-black transition-transform duration-300 hover:scale-110 active:opacity-70"
@@ -61,7 +61,7 @@ const Navbar: React.FC = () => {
               <circle cx="6" cy="18" r="3" />
               <circle cx="16" cy="19" r="3" />
             </svg>
-          </div>
+          </Link>
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
