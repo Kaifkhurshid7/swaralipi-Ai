@@ -1,15 +1,17 @@
-import os
 import numpy as np
 import cv2
 from typing import List, Dict, Tuple
+
+from pathlib import Path
 from ultralytics import YOLO
+
+MODEL_PATH = Path(__file__).resolve().parents[1] / "models" / "best.pt"
 
 class SwaralipiDetector:
     def __init__(self, model_path: str = None):
-        # Default to backend/models/yolo_model.pt
-        self.model_path = model_path or os.path.join(os.path.dirname(__file__), '..', 'models', 'yolo_model.pt')
+        self.model_path = model_path or str(MODEL_PATH)
         
-        if not os.path.exists(self.model_path):
+        if not Path(self.model_path).exists():
             print(f"Warning: Model file not found at {self.model_path}. Detection will fail.")
             self.model = None
         else:

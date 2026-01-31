@@ -5,7 +5,7 @@ echo ==========================================
 
 :: Backend Setup and Start
 echo starting Backend...
-start cmd /k "echo Initializing Backend... && pip install -r requirements.txt && python -m backend.app"
+start cmd /k "echo Initializing Backend... && pip install -r requirements.txt && python backend/app.py"
 
 :: Frontend Setup and Start
 echo Starting Frontend...
