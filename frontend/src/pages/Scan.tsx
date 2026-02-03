@@ -8,6 +8,7 @@ const Scan: React.FC = () => {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
   const navigate = useNavigate();
 
   // Detect device type for contextual UI
@@ -16,7 +17,34 @@ const Scan: React.FC = () => {
       setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
     };
     checkMobile();
-  }, []);
+
+    // Accelerometer-based motion detection
+    const handleMotion = (event: DeviceMotionEvent) => {
+      const acc = event.accelerationIncludingGravity;
+      if (!acc) return;
+
+      const threshold = 15; // sensitivity threshold
+      const magnitude = Math.sqrt(
+        (acc.x || 0) ** 2 +
+        (acc.y || 0) ** 2 +
+        (acc.z || 0) ** 2
+      );
+
+      if (magnitude > threshold) {
+        setIsShaking(true);
+      } else {
+        setIsShaking(false);
+      }
+    };
+
+    if (window.DeviceMotionEvent && isMobile) {
+      window.addEventListener('devicemotion', handleMotion);
+    }
+
+    return () => {
+      window.removeEventListener('devicemotion', handleMotion);
+    };
+  }, [isMobile]);
 
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -79,6 +107,16 @@ const Scan: React.FC = () => {
             <Maximize className="w-4 h-4 text-gray-300" />
           </div>
         </header>
+
+        {/* Motion Feedback */}
+        {isShaking && (
+          <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 flex items-center gap-3 animate-pulse">
+            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600">
+              Hold Steady • Reducing Motion Blur
+            </p>
+          </div>
+        )}
 
         {/* Viewfinder / Drop Zone */}
         <div

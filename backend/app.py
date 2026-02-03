@@ -3,6 +3,8 @@ import sys
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import cv2
+import numpy as np
 from typing import List
 
 # Add the backend directory to path for imports
@@ -26,6 +28,22 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
+def enhance_notation(img: np.ndarray) -> np.ndarray:
+    """
+    Advanced Pre-processing (The 'Clear-Ink' Filter)
+    Removes shadows and increases contrast of faded Devanagari ink.
+    """
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # Removes noise while preserving edges of the Swaras
+    denoised = cv2.fastNlMeansDenoising(gray, h=10)
+    # Handles uneven lighting across the book page
+    thresh = cv2.adaptiveThreshold(
+        denoised, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+        cv2.THRESH_BINARY, 11, 2
+    )
+    # Convert back to 3-channel for YOLO compatibility
+    return cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
+
 
 @app.get('/health')
 def health():
@@ -41,8 +59,18 @@ def health():
 async def detect(file: UploadFile = File(...), confidence: float = 0.3):
     content = await file.read()
     try:
+        # Decode image
+        nparr = np.frombuffer(content, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if img is None:
+            raise HTTPException(status_code=400, detail="Invalid image file")
+
+        # Apply Clear-Ink Filter
+        enhanced_img = enhance_notation(img)
+
         detector = get_detector()
-        detections = detector.detect_from_bytes(content, confidence_threshold=confidence)
+        # Use a new method detect_ndarray to avoid double decoding
+        detections = detector.detect(enhanced_img, confidence_threshold=confidence)
     except Exception as e:
         logger.error(f"Detection failed: {e}")
         import traceback
