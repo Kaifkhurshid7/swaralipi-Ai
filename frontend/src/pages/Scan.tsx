@@ -1,12 +1,22 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { uploadImage } from '../services/api';
+import { Camera, Upload, ChevronLeft, Maximize, ShieldCheck, Zap } from 'lucide-react';
 
 const Scan: React.FC = () => {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+
+  // Detect device type for contextual UI
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
+    checkMobile();
+  }, []);
 
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -17,7 +27,7 @@ const Scan: React.FC = () => {
       sessionStorage.setItem('lastResult', JSON.stringify(res));
       navigate('/result');
     } catch (err) {
-      alert('Upload failed. Please check your backend connection.');
+      alert('Inference Failed: Please verify backend connectivity.');
     } finally {
       setLoading(false);
     }
@@ -27,104 +37,128 @@ const Scan: React.FC = () => {
     return (
       <div className="min-h-screen bg-white">
         <Navbar />
-        <div className="flex flex-col items-center justify-center h-[80vh] px-8 text-center">
-          <div className="relative w-24 h-24 mb-8">
-            {/* Minimalist Scanner Animation */}
-            <div className="absolute inset-0 border-2 border-gray-100 rounded-2xl"></div>
-            <div className="absolute top-0 left-0 right-0 h-0.5 bg-black animate-scan-line"></div>
+        <div className="flex flex-col items-center justify-center h-[85vh] px-8 text-center">
+          <div className="relative w-32 h-40 mb-10">
+            <div className="absolute inset-0 border-[0.5px] border-gray-200 rounded-3xl bg-gray-50/50"></div>
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-black to-transparent animate-scan-line shadow-[0_0_15px_rgba(0,0,0,0.2)]"></div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-4 h-4 bg-black rounded-full animate-pulse"></div>
+              <div className="w-12 h-12 border-2 border-black/5 border-t-black rounded-full animate-spin"></div>
             </div>
           </div>
-          <h2 className="text-xl font-black tracking-tighter italic mb-2 uppercase">Analyzing</h2>
-          <p className="text-gray-400 text-[11px] font-bold uppercase tracking-[0.2em]">
-            Detecting Swaras • Mapping Sequence
-          </p>
+          <h2 className="text-2xl font-black tracking-tighter italic uppercase mb-3">Processing</h2>
+          <div className="flex items-center gap-2">
+            <Zap className="w-3 h-3 text-black animate-pulse" />
+            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.3em]">
+              Neural Inference • Swara Mapping
+            </p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white text-black font-sans">
+    <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white">
       <Navbar />
 
-      <main className="max-w-md mx-auto px-6 pt-8 pb-32">
-        <header className="flex items-center justify-between mb-8">
+      <main className="max-w-md mx-auto px-6 pt-6 pb-40">
+        <header className="flex items-center justify-between mb-10">
           <button
             onClick={() => navigate(-1)}
-            className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-100 hover:bg-gray-50 transition-colors"
+            className="group w-12 h-12 flex items-center justify-center rounded-2xl border border-gray-100 hover:border-black transition-all active:scale-90"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
           </button>
-          <h2 className="text-xl font-black tracking-tighter italic">SCANNER</h2>
-          <div className="w-10"></div>
+          <div className="text-center">
+            <h2 className="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em] mb-0.5">Terminal</h2>
+            <h1 className="text-lg font-black tracking-tight uppercase italic leading-none">
+              {isMobile ? 'Optical Scan' : 'File Ingestion'}
+            </h1>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center">
+            <Maximize className="w-4 h-4 text-gray-300" />
+          </div>
         </header>
 
-        {/* Viewfinder Area */}
+        {/* Viewfinder / Drop Zone */}
         <div
           onClick={() => fileRef.current?.click()}
-          className="relative group cursor-pointer active:scale-[0.98] transition-all"
+          className="relative group cursor-pointer active:scale-[0.99] transition-all duration-500"
         >
-          {/* Corner Brackets for Viewfinder */}
-          <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-black rounded-tl-xl z-10"></div>
-          <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-black rounded-tr-xl z-10"></div>
-          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-black rounded-bl-xl z-10"></div>
-          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-black rounded-br-xl z-10"></div>
+          {/* Precise Corner Brackets */}
+          <div className="absolute top-0 left-0 w-10 h-10 border-t-[3px] border-l-[3px] border-black rounded-tl-3xl z-10 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1"></div>
+          <div className="absolute top-0 right-0 w-10 h-10 border-t-[3px] border-r-[3px] border-black rounded-tr-3xl z-10 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"></div>
+          <div className="absolute bottom-0 left-0 w-10 h-10 border-b-[3px] border-l-[3px] border-black rounded-bl-3xl z-10 transition-transform group-hover:-translate-x-1 group-hover:translate-y-1"></div>
+          <div className="absolute bottom-0 right-0 w-10 h-10 border-b-[3px] border-r-[3px] border-black rounded-br-3xl z-10 transition-transform group-hover:translate-x-1 group-hover:translate-y-1"></div>
 
-          <div className="w-full aspect-[3/4] bg-gray-50 rounded-2xl flex flex-col items-center justify-center overflow-hidden border border-gray-100">
-            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm mb-6 group-hover:scale-110 transition-transform duration-500">
-              <svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <circle cx="12" cy="13" r="3" strokeWidth={1.5} />
-              </svg>
+          <div className="w-full aspect-[4/5] bg-[#fafafa] rounded-[2.5rem] flex flex-col items-center justify-center overflow-hidden border border-gray-100 relative shadow-inner">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-100/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center shadow-[0_15px_40px_-10px_rgba(0,0,0,0.08)] mb-8 group-hover:scale-105 transition-all duration-700 group-hover:rotate-3">
+                {isMobile ? (
+                  <Camera className="w-10 h-10 text-black" strokeWidth={1.2} />
+                ) : (
+                  <Upload className="w-10 h-10 text-black" strokeWidth={1.2} />
+                )}
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 group-hover:text-black transition-colors duration-500 text-center px-8">
+                {isMobile
+                  ? 'Awaiting Camera Input'
+                  : 'Click to Browse or Drag File'}
+              </p>
             </div>
-            <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 max-w-[200px] text-center leading-relaxed px-4">
-              Place notation book within frame for optimal detection
-            </p>
           </div>
 
           <input
             ref={fileRef}
             type="file"
             accept="image/*"
-            capture="environment"
+            capture={isMobile ? "environment" : undefined}
             className="hidden"
             onChange={onPick}
           />
         </div>
 
-        {/* Guidance Section */}
-        {/* <div className="mt-10 space-y-4">
-          <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-50 bg-gray-50/50">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <p className="text-xs font-bold text-gray-600 tracking-tight">AI Engine Ready: YOLOv8 Inference</p>
+        <div className="mt-12">
+          <div className="flex items-center justify-between p-5 rounded-3xl bg-gray-50/80 border border-gray-100">
+            <div className="flex items-center gap-4">
+              <div className="relative flex">
+                <div className="w-2 h-2 bg-black rounded-full animate-ping absolute"></div>
+                <div className="w-2 h-2 bg-black rounded-full relative"></div>
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-black mb-0.5">YOLOv8 Engine</p>
+                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none italic">Status: System Ready</p>
+              </div>
+            </div>
+            <ShieldCheck className="w-4 h-4 text-gray-300" />
           </div>
-        </div> */}
+        </div>
 
-        {/* Footer Action */}
-        <div className="fixed bottom-0 left-0 right-0 p-8 bg-white/80 backdrop-blur-md">
+        {/* Sticky Footer Action */}
+        <div className="fixed bottom-0 left-0 right-0 p-8 bg-white/90 backdrop-blur-xl border-t border-gray-50 flex flex-col items-center">
           <button
             onClick={() => fileRef.current?.click()}
-            className="w-full bg-black text-white py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-[0.98] transition-all"
+            className="w-full max-w-sm bg-black text-white py-6 rounded-3xl font-black text-xs uppercase tracking-[0.4em] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] active:scale-[0.96] transition-all hover:bg-zinc-900"
           >
-            Click to Upload
+            {isMobile ? 'Initialize Scanner' : 'Upload Notation'}
           </button>
-          <p className="text-center mt-4 text-[9px] font-bold text-gray-300 uppercase tracking-widest">
-            Supports High-Res JPG & PNG
+          <p className="mt-6 text-[8px] font-black uppercase tracking-[0.4em] text-gray-300">
+            High-Res JPG • PNG • HEIC
           </p>
         </div>
       </main>
 
       <style>{`
         @keyframes scan-line {
-          0% { top: 0% }
-          100% { top: 100% }
+          0% { top: 0%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
         }
         .animate-scan-line {
-          animation: scan-line 2s linear infinite;
+          animation: scan-line 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
       `}</style>
     </div>
