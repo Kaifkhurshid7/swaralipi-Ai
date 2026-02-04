@@ -1,5 +1,6 @@
 from pathlib import Path
 import torch
+import numpy as np
 from sahi.models.ultralytics import UltralyticsDetectionModel
 from sahi.predict import get_sliced_prediction
 
@@ -22,16 +23,19 @@ detection_model = UltralyticsDetectionModel(
     device="cpu"   # change to "cuda" if GPU is available
 )
 
-def run_detection(image_path: str):
+def run_detection(image: np.ndarray):
     """
-    Runs SAHI sliced inference on an image
+    Runs SAHI sliced inference with optimized parameters for small notes.
     """
+    # Optimized for 800-1200px scanned documents
     result = get_sliced_prediction(
-        image_path,
+        image,
         detection_model,
-        slice_height=640,
-        slice_width=640,
-        overlap_height_ratio=0.2,
-        overlap_width_ratio=0.2
+        slice_height=480,
+        slice_width=480,
+        overlap_height_ratio=0.25,
+        overlap_width_ratio=0.25,
+        postprocess_type="NMM", # Non-Maximum Merging for better boundary handling
+        postprocess_match_threshold=0.5
     )
     return result

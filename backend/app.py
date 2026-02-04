@@ -50,24 +50,30 @@ def deskew(img: np.ndarray) -> np.ndarray:
 
 def enhance_notation(img: np.ndarray) -> np.ndarray:
     """
-    Swaralipi X-Engine Pre-processing
-    Uses CLAHE (Contrast Limited Adaptive Histogram Equalization) and deskewing.
+    Advanced Swaralipi X-Engine Pre-processing
+    Uses Deskewing, Bilateral Filtering, CLAHE, and Unsharp Masking.
     """
     # 1. Deskew
     img = deskew(img)
     
-    # 2. Convert to LAB color space and apply CLAHE to L-channel
+    # 2. Noise Reduction (Bilateral Filter)
+    # Preserves edges (swaras) while removing paper grain/noise
+    img = cv2.bilateralFilter(img, 9, 75, 75)
+    
+    # 3. Contrast Enhancement (CLAHE on L-channel)
     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
     l, a, b = cv2.split(lab)
-    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+    clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8,8))
     cl = clahe.apply(l)
     limg = cv2.merge((cl, a, b))
-    final = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+    img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
     
-    # 3. Denoising
-    final = cv2.fastNlMeansDenoisingColored(final, None, 10, 10, 7, 21)
+    # 4. Adaptive Sharpening (Unsharp Mask)
+    # Gaussian blur subtracted from original to highlight high-frequency details (dots/modifiers)
+    gaussian = cv2.GaussianBlur(img, (0, 0), 3)
+    img = cv2.addWeighted(img, 1.5, gaussian, -0.5, 0)
     
-    return final
+    return img
 
 
 @app.get('/health')
