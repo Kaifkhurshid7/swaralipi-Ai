@@ -28,21 +28,46 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
+def deskew(img: np.ndarray) -> np.ndarray:
+    """Corrects image rotation for better horizontal alignment."""
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.bitwise_not(gray)
+    thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+    
+    coords = np.column_stack(np.where(thresh > 0))
+    angle = cv2.minAreaRect(coords)[-1]
+    
+    if angle < -45:
+        angle = -(90 + angle)
+    else:
+        angle = -angle
+        
+    (h, w) = img.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    rotated = cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    return rotated
+
 def enhance_notation(img: np.ndarray) -> np.ndarray:
     """
-    Advanced Pre-processing (The 'Clear-Ink' Filter)
-    Removes shadows and increases contrast of faded Devanagari ink.
+    Swaralipi X-Engine Pre-processing
+    Uses CLAHE (Contrast Limited Adaptive Histogram Equalization) and deskewing.
     """
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # Removes noise while preserving edges of the Swaras
-    denoised = cv2.fastNlMeansDenoising(gray, h=10)
-    # Handles uneven lighting across the book page
-    thresh = cv2.adaptiveThreshold(
-        denoised, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-        cv2.THRESH_BINARY, 11, 2
-    )
-    # Convert back to 3-channel for YOLO compatibility
-    return cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
+    # 1. Deskew
+    img = deskew(img)
+    
+    # 2. Convert to LAB color space and apply CLAHE to L-channel
+    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    l, a, b = cv2.split(lab)
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+    cl = clahe.apply(l)
+    limg = cv2.merge((cl, a, b))
+    final = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+    
+    # 3. Denoising
+    final = cv2.fastNlMeansDenoisingColored(final, None, 10, 10, 7, 21)
+    
+    return final
 
 
 @app.get('/health')
@@ -71,6 +96,18 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
         detector = get_detector()
         # Use a new method detect_ndarray to avoid double decoding
         detections = detector.detect(enhanced_img, confidence_threshold=confidence)
+        
+        # Semantic Sequence Policing: Filter out 'merged' or 'noise' boxes
+        # Extreme aspect ratios or huge boxes are usually wrong
+        filtered_detections = []
+        for d in detections:
+            x1, y1, x2, y2 = d['bbox']
+            w, h = x2 - x1, y2 - y1
+            if w > h * 4 or h > w * 4: # Too elongated
+                continue
+            filtered_detections.append(d)
+        detections = filtered_detections
+
     except Exception as e:
         logger.error(f"Detection failed: {e}")
         import traceback
