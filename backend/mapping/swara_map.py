@@ -8,9 +8,50 @@ SWARA_TO_NUM = {
     'ni': 7,
 }
 
-def map_swara_to_num(label: str) -> int:
-    # Clean the label (e.g., "Dha(dot above)" -> "dha")
-    # Take the part before any bracket or number
+# Mapping of model labels to (English Description, Hindi Symbol)
+SWARA_DETAILS = {
+    "Dha(dot above)": ("Dha (Dot Above)", "ध̇"),
+    "Dha(dot below)": ("Dha (Dot Below)", "ध̣"),
+    "Dha(no dot)": ("Dha (No Dot)", "ध"),
+    "Ga(dot above)": ("Ga (Dot Above)", "ग̇"),
+    "Ga(dot below)": ("Ga (Dot Below)", "ग̣"),
+    "Ga(no dot)": ("Ga (No Dot)", "ग"),
+    "Ga1(dot above)": ("Ga (Komal, Dot Above)", "ग॒̇"),
+    "Handwriting": ("Handwriting", "✍"),
+    "Ma(dot above)": ("Ma (Dot Above)", "म̇"),
+    "Ma(no dot)": ("Ma (No Dot)", "म"),
+    "Ma2(dot above)": ("Ma (Teevra, Dot Above)", "म॑̇"),
+    "Ma2(dot below)": ("Ma (Teevra, Dot Below)", "म̣॑"),
+    "Ma2(no dot)": ("Ma (Teevra, No Dot)", "म॑"),
+    "Ni(dot below)": ("Ni (Dot Below)", "नि̣"),
+    "Ni(no dot)": ("Ni (No Dot)", "नि"),
+    "Ni1(dot below)": ("Ni (Komal, Dot Below)", "नि॒̣"),
+    "Ni1(no dot)": ("Ni (Komal, No Dot)", "नि॒"),
+    "Pa(dot above)": ("Pa (Dot Above)", "प̇"),
+    "Pa(dot below)": ("Pa (Dot Below)", "प̣"),
+    "Pa(no dot)": ("Pa (No Dot)", "प"),
+    "Re(dot above)": ("Re (Dot Above)", "रे̇"),
+    "Re(no dot)": ("Re (No Dot)", "रे"),
+    "Re1(dot above)": ("Re (Komal, Dot Above)", "रे॒̇"),
+    "Re1(no dot)": ("Re (Komal, No Dot)", "रे॒"),
+    "Sa(dot above)": ("Sa (Dot Above)", "स̇"),
+    "Sa(no dot)": ("Sa (No Dot)", "स"),
+}
+
+def get_swara_details(label: str):
+    """Returns (English Name, Symbol, Numeric)"""
+    details = SWARA_DETAILS.get(label, (label, label))
+    
+    # Extract numeric value for sequence
     import re
     cleaned = re.split(r'\(|\d', label)[0].lower().strip()
-    return SWARA_TO_NUM.get(cleaned, -1)
+    num = SWARA_TO_NUM.get(cleaned, -1)
+    
+    return {
+        "english": details[0],
+        "symbol": details[1],
+        "numeric": num
+    }
+
+def map_swara_to_num(label: str) -> int:
+    return get_swara_details(label)["numeric"]

@@ -4,6 +4,8 @@ import Navbar from '../components/Navbar';
 
 interface Detection {
   label: string;
+  english_name: string;
+  symbol: string;
   score: number;
   bbox: number[];
   numeric: number | null;
@@ -86,9 +88,14 @@ const Result: React.FC = () => {
             <div className="space-y-2 sm:space-y-3">
               {data.detections.map((d, i) => (
                 <div key={i} className="flex items-center justify-between p-4 sm:p-5 bg-white border border-gray-200 rounded-2xl">
-                  <div>
-                    <span className="text-lg sm:text-xl font-bold text-black block">{d.label}</span>
-                    <span className="text-xs sm:text-sm text-secondary">Mapping: <span className="text-black font-mono font-bold">{d.numeric}</span></span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-xl text-2xl font-bold text-black border border-gray-200">
+                      {d.symbol}
+                    </div>
+                    <div>
+                      <span className="text-lg sm:text-xl font-bold text-black block">{d.english_name || d.label}</span>
+                      <span className="text-xs sm:text-sm text-secondary">Mapping: <span className="text-black font-mono font-bold">{d.numeric}</span></span>
+                    </div>
                   </div>
                   <span className="text-xs text-gray-400 font-medium">{(d.score * 100).toFixed(0)}%</span>
                 </div>

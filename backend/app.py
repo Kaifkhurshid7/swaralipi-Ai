@@ -10,7 +10,7 @@ from typing import List
 # Add the backend directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from mapping.swara_map import map_swara_to_num
+from mapping.swara_map import map_swara_to_num, get_swara_details
 from database import save_scan, get_history
 from schemas import DetectResponse, Detection
 from inference.detector import run_detection
@@ -125,8 +125,16 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
     overall_confidence = float(sum(d['score'] for d in detections) / len(detections)) if detections else 0.0
 
     det_objs = []
-    for d, num in zip(detections, numeric_sequence):
-        det = Detection(label=d['label'], score=d['score'], bbox=d['bbox'], numeric=num)
+    for d in detections:
+        details = get_swara_details(d['label'])
+        det = Detection(
+            label=d['label'],
+            english_name=details['english'],
+            symbol=details['symbol'],
+            score=d['score'],
+            bbox=d['bbox'],
+            numeric=details['numeric']
+        )
         det_objs.append(det)
 
     from datetime import datetime

@@ -4,6 +4,8 @@ from typing import List
 
 class Detection(BaseModel):
     label: str
+    english_name: str | None = None
+    symbol: str | None = None
     score: float
     bbox: List[int]
     numeric: int | None = None
