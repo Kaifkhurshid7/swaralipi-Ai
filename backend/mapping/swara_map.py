@@ -44,8 +44,17 @@ def get_swara_details(label: str):
     
     # Extract numeric value for sequence
     import re
-    cleaned = re.split(r'\(|\d', label)[0].lower().strip()
-    num = SWARA_TO_NUM.get(cleaned, -1)
+    base_label = re.split(r'\(|\d', label)[0].lower().strip()
+    num = SWARA_TO_NUM.get(base_label, -1)
+    
+    # 🔹 OCTAVE MODIFICATION LOGIC 
+    # Ignore -1 (Handwriting/Noise)
+    if num != -1:
+        if "(dot above)" in label:
+            num += 10 # Taar Saptak
+        elif "(dot below)" in label:
+            num -= 10 # Mandra Saptak
+            # Note: We use -10 offset rather than -7 to keep math simple and distinct
     
     return {
         "english": details[0],

@@ -14,6 +14,10 @@ from mapping.swara_map import map_swara_to_num, get_swara_details
 from database import save_scan, get_history
 from schemas import DetectResponse, Detection
 from inference.detector import run_detection
+from inference.post_process import PostProcessor
+
+# Initialize post-processor
+post_processor = PostProcessor(confidence_threshold=0.45, iou_threshold=0.4)
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -50,17 +54,15 @@ def deskew(img: np.ndarray) -> np.ndarray:
 
 def enhance_notation(img: np.ndarray) -> np.ndarray:
     """
-    Advanced Swaralipi X-Engine Pre-processing
-    Uses Deskewing, Bilateral Filtering, CLAHE, and Unsharp Masking.
+    Precision Swaralipi X-Engine Pre-processing
     """
     # 1. Deskew
     img = deskew(img)
     
-    # 2. Noise Reduction (Bilateral Filter)
-    # Preserves edges (swaras) while removing paper grain/noise
-    img = cv2.bilateralFilter(img, 9, 75, 75)
+    # 2. Gentle Noise Reduction (Reduced radius to protect dots)
+    img = cv2.bilateralFilter(img, 5, 50, 50)
     
-    # 3. Contrast Enhancement (CLAHE on L-channel)
+    # 3. High-Contrast CLAHE
     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
     l, a, b = cv2.split(lab)
     clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8,8))
@@ -68,9 +70,8 @@ def enhance_notation(img: np.ndarray) -> np.ndarray:
     limg = cv2.merge((cl, a, b))
     img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
     
-    # 4. Adaptive Sharpening (Unsharp Mask)
-    # Gaussian blur subtracted from original to highlight high-frequency details (dots/modifiers)
-    gaussian = cv2.GaussianBlur(img, (0, 0), 3)
+    # 4. Precision Sharpening (Small sigma for modifier dots)
+    gaussian = cv2.GaussianBlur(img, (0, 0), 1) # Sigma=1 is better for small dots
     img = cv2.addWeighted(img, 1.5, gaussian, -0.5, 0)
     
     return img
@@ -109,26 +110,14 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
                 'bbox': [int(pred.bbox.minx), int(pred.bbox.miny), int(pred.bbox.maxx), int(pred.bbox.maxy)]
             })
         
-        # Semantic Sequence Policing: Filter out 'merged' or 'noise' boxes
-        # Extreme aspect ratios or huge boxes are usually wrong
-        filtered_detections = []
-        for d in detections:
-            x1, y1, x2, y2 = d['bbox']
-            w, h = x2 - x1, y2 - y1
-            if w > h * 6 or h > w * 6: # Slightly more lenient for SAHI
-                continue
-            filtered_detections.append(d)
-        detections = filtered_detections
+        # Use the robust post-processor
+        detections = post_processor.process(detections)
 
     except Exception as e:
         logger.error(f"Detection failed: {e}")
         import traceback
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail="Backend Analysis Failed. Check server logs.")
-
-    ordered_labels = [d['label'] for d in detections]
-    numeric_sequence = [map_swara_to_num(lbl) for lbl in ordered_labels]
-    overall_confidence = float(sum(d['score'] for d in detections) / len(detections)) if detections else 0.0
 
     det_objs = []
     for d in detections:
@@ -142,6 +131,10 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
             numeric=details['numeric']
         )
         det_objs.append(det)
+
+    ordered_labels = [d.label for d in det_objs if d.numeric != -1]
+    numeric_sequence = [d.numeric for d in det_objs if d.numeric != -1]
+    overall_confidence = float(sum(d.score for d in det_objs) / len(det_objs)) if det_objs else 0.0
 
     from datetime import datetime
     response = DetectResponse(
