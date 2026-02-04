@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from mapping.swara_map import map_swara_to_num
 from database import save_scan, get_history
 from schemas import DetectResponse, Detection
-from inference.detector import get_detector
+from inference.detector import run_detection
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -72,11 +72,9 @@ def enhance_notation(img: np.ndarray) -> np.ndarray:
 
 @app.get('/health')
 def health():
-    detector = get_detector()
     return {
         "status": "healthy",
-        "model_loaded": detector.model is not None,
-        "model_path": detector.model_path
+        "engine": "SAHI"
     }
 
 
@@ -93,9 +91,17 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
         # Apply Clear-Ink Filter
         enhanced_img = enhance_notation(img)
 
-        detector = get_detector()
-        # Use a new method detect_ndarray to avoid double decoding
-        detections = detector.detect(enhanced_img, confidence_threshold=confidence)
+        # Run SAHI detection
+        result = run_detection(enhanced_img)
+        
+        # Convert SAHI result to expected format
+        detections = []
+        for pred in result.object_prediction_list:
+            detections.append({
+                'label': pred.category.name,
+                'score': float(pred.score.value),
+                'bbox': [int(pred.bbox.minx), int(pred.bbox.miny), int(pred.bbox.maxx), int(pred.bbox.maxy)]
+            })
         
         # Semantic Sequence Policing: Filter out 'merged' or 'noise' boxes
         # Extreme aspect ratios or huge boxes are usually wrong
@@ -103,7 +109,7 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
         for d in detections:
             x1, y1, x2, y2 = d['bbox']
             w, h = x2 - x1, y2 - y1
-            if w > h * 4 or h > w * 4: # Too elongated
+            if w > h * 6 or h > w * 6: # Slightly more lenient for SAHI
                 continue
             filtered_detections.append(d)
         detections = filtered_detections
