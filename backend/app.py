@@ -54,25 +54,28 @@ def deskew(img: np.ndarray) -> np.ndarray:
 
 def enhance_notation(img: np.ndarray) -> np.ndarray:
     """
-    Precision Swaralipi X-Engine Pre-processing
+    Precision Swaralipi X-Engine Pre-processing v2
     """
     # 1. Deskew
     img = deskew(img)
     
-    # 2. Gentle Noise Reduction (Reduced radius to protect dots)
-    img = cv2.bilateralFilter(img, 5, 50, 50)
+    # 2. Convert to grayscale for contrast work
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
-    # 3. High-Contrast CLAHE
-    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-    l, a, b = cv2.split(lab)
-    clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8,8))
-    cl = clahe.apply(l)
-    limg = cv2.merge((cl, a, b))
-    img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+    # 3. High-Contrast CLAHE (Smaller tile size for localized contrast)
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(4,4))
+    gray = clahe.apply(gray)
     
-    # 4. Precision Sharpening (Small sigma for modifier dots)
-    gaussian = cv2.GaussianBlur(img, (0, 0), 1) # Sigma=1 is better for small dots
-    img = cv2.addWeighted(img, 1.5, gaussian, -0.5, 0)
+    # 4. Precision Sharpening (Unsharp Masking)
+    # This specifically highlights small details like dots
+    gaussian = cv2.GaussianBlur(gray, (0, 0), 2.0)
+    gray = cv2.addWeighted(gray, 2.0, gaussian, -1.0, 0)
+    
+    # 5. Denoise slightly but keep edges (FastNlMeansDenoising is good for scanned docs)
+    gray = cv2.fastNlMeansDenoising(gray, None, 10, 7, 21)
+    
+    # 6. Convert back to BGR for model compatibility
+    img = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
     
     return img
 

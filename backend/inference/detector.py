@@ -25,17 +25,28 @@ detection_model = UltralyticsDetectionModel(
 
 def run_detection(image: np.ndarray):
     """
-    Runs SAHI sliced inference with optimized parameters for small notes.
+    Runs multi-scale SAHI sliced inference for 99% accuracy mission.
     """
-    # Optimized for 800-1200px scanned documents
-    result = get_sliced_prediction(
-        image,
-        detection_model,
-        slice_height=480,
-        slice_width=480,
-        overlap_height_ratio=0.25,
-        overlap_width_ratio=0.25,
-        postprocess_type="NMM", # Non-Maximum Merging for better boundary handling
-        postprocess_match_threshold=0.5
-    )
-    return result
+    # Run inference at two different slice scales to catch all swara sizes
+    scales = [400, 600]
+    all_predictions = []
+    
+    for size in scales:
+        result = get_sliced_prediction(
+            image,
+            detection_model,
+            slice_height=size,
+            slice_width=size,
+            overlap_height_ratio=0.3, # Increased overlap for better continuity
+            overlap_width_ratio=0.3,
+            postprocess_type="NMM",
+            postprocess_match_threshold=0.5
+        )
+        all_predictions.extend(result.object_prediction_list)
+    
+    # We'll let SAHI's post-processing handle individual scale merges, 
+    # but since we combined scales manually, we return the first result object with extended list 
+    # as a simple way to pass it back to app.py
+    final_result = get_sliced_prediction(image, detection_model, slice_height=1000, slice_width=1000)
+    final_result.object_prediction_list = all_predictions
+    return final_result
