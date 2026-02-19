@@ -60,44 +60,51 @@ const Result: React.FC = () => {
         </header>
 
         <div className="px-4 sm:px-6 py-6 sm:py-8">
-          {/* Overall Confidence Section */}
+          {/* Analysis Summary Section */}
           <section className="mb-6 sm:mb-8">
-            <div className="bg-white border border-gray-200 rounded-2xl text-center py-8 sm:py-10">
-              <div className="text-xs sm:text-sm text-secondary uppercase tracking-widest mb-2 sm:mb-3 font-bold">Overall Confidence</div>
-              <div className="text-6xl sm:text-7xl font-black text-black">
-                {(data.overall_confidence * 100).toFixed(1)}%
+            <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 space-y-6">
+              <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+                <span className="text-secondary font-bold text-xs sm:text-sm uppercase tracking-widest">Annotations Detected</span>
+                <span className="text-2xl sm:text-3xl font-black text-black">{data.detections.length}</span>
+              </div>
+
+              <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+                <span className="text-secondary font-bold text-xs sm:text-sm uppercase tracking-widest">System Accuracy</span>
+                <span className="text-2xl sm:text-3xl font-black text-primary">{(data.overall_confidence * 100).toFixed(1)}%</span>
+              </div>
+
+              <div>
+                <span className="text-secondary font-bold text-xs sm:text-sm uppercase tracking-widest block mb-4">Composition Names</span>
+                <div className="flex flex-wrap gap-2">
+                  {data.ordered_labels.map((label, i) => (
+                    <span key={i} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs sm:text-sm font-bold border border-gray-200">
+                      {label.split('(')[0]}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </section>
 
-          {/* Numeric Sequence Section */}
-          <section className="mb-6 sm:mb-8">
-            <h3 className="text-xs sm:text-sm text-secondary uppercase tracking-widest mb-4 font-bold">Numeric Sequence</h3>
-            <div className="flex flex-wrap gap-3 bg-white border border-gray-200 rounded-2xl p-4 sm:p-5">
-              {data.numeric_sequence.map((n, i) => (
-                <div key={i} className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center bg-black text-white rounded-xl text-xl sm:text-2xl font-black">
-                  {n}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Detected Swaras Section */}
+          {/* Detailed Breakdown Section */}
           <section className="mb-28 sm:mb-32">
-            <h3 className="text-xs sm:text-sm text-secondary uppercase tracking-widest mb-4 font-bold">Detected Swaras</h3>
-            <div className="space-y-2 sm:space-y-3">
+            <h3 className="text-xs sm:text-sm text-secondary uppercase tracking-widest mb-4 font-bold px-1">Detailed Breakdown</h3>
+            <div className="space-y-3 sm:space-y-4">
               {data.detections.map((d, i) => (
-                <div key={i} className="flex items-center justify-between p-4 sm:p-5 bg-white border border-gray-200 rounded-2xl">
+                <div key={i} className="flex items-center justify-between p-4 sm:p-5 bg-white border border-gray-200 rounded-2xl hover:border-black transition-all">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-xl text-2xl font-bold text-black border border-gray-200">
+                    <div className="w-12 h-12 flex items-center justify-center bg-black text-white rounded-xl text-2xl font-bold shadow-sm">
                       {d.symbol}
                     </div>
                     <div>
-                      <span className="text-lg sm:text-xl font-bold text-black block">{d.english_name || d.label}</span>
-                      <span className="text-xs sm:text-sm text-secondary">Mapping: <span className="text-black font-mono font-bold">{d.numeric}</span></span>
+                      <span className="text-lg sm:text-xl font-bold text-black block leading-tight">{d.english_name || d.label}</span>
+                      <span className="text-xs sm:text-sm text-secondary font-medium">Confidence: {Math.round(d.score * 100)}%</span>
                     </div>
                   </div>
-                  <span className="text-xs text-gray-400 font-medium">{(d.score * 100).toFixed(0)}%</span>
+                  <div className="text-right">
+                    <div className="text-xs text-secondary font-bold uppercase tracking-tighter">Pos</div>
+                    <div className="text-sm font-black text-black">#{i + 1}</div>
+                  </div>
                 </div>
               ))}
             </div>
