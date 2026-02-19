@@ -9,6 +9,7 @@ class Detection(BaseModel):
     score: float
     bbox: List[int]
     numeric: int | None = None
+    octave: str | None = None
 
 
 class DetectResponse(BaseModel):

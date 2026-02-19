@@ -1,11 +1,16 @@
-SWARA_TO_NUM = {
+SWARA_TO_SEMITONE = {
     'sa': 1,
-    're': 2,
-    'ga': 3,
-    'ma': 4,
-    'pa': 5,
-    'dha': 6,
-    'ni': 7,
+    're1': 2,
+    're': 3,
+    'ga1': 4,
+    'ga': 5,
+    'ma': 6,
+    'ma2': 7,
+    'pa': 8,
+    'dha1': 9,
+    'dha': 10,
+    'ni1': 11,
+    'ni': 12,
 }
 
 # Mapping of model labels to (English Description, Hindi Symbol)
@@ -39,27 +44,36 @@ SWARA_DETAILS = {
 }
 
 def get_swara_details(label: str):
-    """Returns (English Name, Symbol, Numeric)"""
+    """Returns (English Name, Symbol, Numeric (1-12), Octave)"""
     details = SWARA_DETAILS.get(label, (label, label))
     
-    # Extract numeric value for sequence
+    # Extract base note (e.g., 'Sa', 'Re1', 'Ma2')
     import re
-    base_label = re.split(r'\(|\d', label)[0].lower().strip()
-    num = SWARA_TO_NUM.get(base_label, -1)
+    # We want to keep the digit if it's 1 or 2 as part of the base note name for semitone lookup
+    match = re.match(r'^([A-Za-z]+[12]?)', label)
+    if match:
+        base_label = match.group(1).lower()
+    else:
+        base_label = label.lower()
+        
+    num = SWARA_TO_SEMITONE.get(base_label, -1)
     
-    # 🔹 OCTAVE MODIFICATION LOGIC 
-    # Ignore -1 (Handwriting/Noise)
-    if num != -1:
-        if "(dot above)" in label:
-            num += 10 # Taar Saptak
-        elif "(dot below)" in label:
-            num -= 10 # Mandra Saptak
-            # Note: We use -10 offset rather than -7 to keep math simple and distinct
+    # 🔹 OCTAVE LOGIC 
+    octave = "Middle"
+    if "(dot above)" in label:
+        octave = "Upper"
+    elif "(dot below)" in label:
+        octave = "Lower"
     
+    # Handle noise/handwriting
+    if num == -1:
+        octave = None
+
     return {
         "english": details[0],
         "symbol": details[1],
-        "numeric": num
+        "numeric": num,
+        "octave": octave
     }
 
 def map_swara_to_num(label: str) -> int:

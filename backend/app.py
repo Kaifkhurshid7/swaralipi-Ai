@@ -128,7 +128,8 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
             symbol=details['symbol'],
             score=d['score'],
             bbox=d['bbox'],
-            numeric=details['numeric']
+            numeric=details['numeric'],
+            octave=details['octave']
         )
         det_objs.append(det)
 
