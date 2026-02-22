@@ -31,19 +31,78 @@ SWARA_DETAILS = {
 }
 
 def get_swara_details(label: str):
-    """Returns (English Name, Symbol, Numeric (1-12), Octave) - Simplified version"""
-    # Direct lookup from the 12 classes
-    details = SWARA_DETAILS.get(label, (label, label))
+    """Returns (English Name, Symbol, Numeric (1-12), Octave) with ultra-robust lookup."""
+    label = str(label)
     
-    # Optional: Keep some numeric/octave info if it can be inferred, 
-    # but the user asked to "dont do any matching and all".
-    # I'll provide basic placeholders to avoid breaking app.py
+    # 1. Direct Lookup (Exact)
+    details = SWARA_DETAILS.get(label)
+    
+    # 2. Robust lookup (Case-insensitive, Prefix matching, Suffix stripping)
+    if not details:
+        label_clean = label.split('(')[0].strip().lower() # 'Sa(dot)' -> 'sa'
+        label_lower = label.lower()
+        
+        # Priority 1: Case-insensitive match on full label
+        for key, val in SWARA_DETAILS.items():
+            if key.lower() == label_lower:
+                details = val
+                break
+        
+        # Priority 2: Match on clean prefix (e.g., 'Sa' from 'Sa(no dot)')
+        if not details:
+            for key, val in SWARA_DETAILS.items():
+                key_clean = key.split('(')[0].strip().lower()
+                if key_clean == label_clean:
+                    details = val
+                    break
+                    
+    # 3. Fallback to basic swara identification if still not found
+    if not details:
+        base_swaras = ['sa', 're', 'ga', 'ma', 'pa', 'dha', 'ni']
+        label_lower = label.lower()
+        for base in base_swaras:
+            if base in label_lower:
+                # Find the first matching base swara details
+                # Check for Komal/Tivra keywords
+                is_komal = 'komal' in label_lower or '♭' in label_lower or '_' in label_lower
+                is_tivra = 'tivra' in label_lower or '♯' in label_lower or 'm2' in label_clean or 'ma2' in label_clean
+                
+                for key, val in SWARA_DETAILS.items():
+                    k_lower = key.lower()
+                    if k_lower.startswith(base):
+                        if is_komal and ('komal' in k_lower or '♭' in k_lower):
+                            details = val
+                            break
+                        if is_tivra and ('tivra' in k_lower or '♯' in k_lower):
+                            details = val
+                            break
+                        if not is_komal and not is_tivra and 'komal' not in k_lower and 'tivra' not in k_lower and '♭' not in k_lower and '♯' not in k_lower:
+                            details = val
+                            break
+                if not details: # Default to base if specialized version not found
+                    for key, val in SWARA_DETAILS.items():
+                        if key.lower().startswith(base):
+                            details = val
+                            break
+                if details: break
+                
+    if not details:
+        details = (label, label)
+    
+    # Optional mapping for numeric values based on clean label
+    label_clean = label.split('(')[0].strip().lower()
+    numeric = SWARA_TO_SEMITONE.get(label_clean, -1)
+    if numeric == -1: # Try base lookup
+        for base, num in SWARA_TO_SEMITONE.items():
+            if base in label_clean:
+                numeric = num
+                break
     
     return {
         "english": details[0],
         "symbol": details[1],
-        "numeric": -1, # Set to -1 to satisfy existing logic without "matching"
-        "octave": "Natural"
+        "numeric": numeric,
+        "octave": "Natural" # Default
     }
 
 def map_swara_to_num(label: str) -> int:

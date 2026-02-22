@@ -230,12 +230,14 @@ const Result: React.FC = () => {
                 }}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 bg-zinc-50 rounded-xl flex items-center justify-center text-xl font-black italic border border-zinc-50 shadow-sm">
-                    {activeDetection.symbol}
+                  <div className="w-12 h-12 bg-zinc-50 rounded-xl flex items-center justify-center text-2xl font-black italic border border-zinc-100 shadow-sm text-black">
+                    {activeDetection.symbol && activeDetection.symbol.length <= 2 ? activeDetection.symbol : activeDetection.symbol?.[0] || '?'}
                   </div>
                   <div className="pr-2">
                     <p className="text-[7px] font-black uppercase tracking-[0.2em] text-zinc-300 mb-0.5 whitespace-nowrap">Neural Feedback</p>
-                    <p className="text-sm font-black uppercase italic tracking-tighter whitespace-nowrap leading-none mb-1.5">{activeDetection.english_name}</p>
+                    <p className="text-sm font-black uppercase italic tracking-tighter whitespace-nowrap leading-none mb-1.5">
+                      {activeDetection.english_name || activeDetection.label}
+                    </p>
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
                         <div

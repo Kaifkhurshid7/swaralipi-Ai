@@ -30,7 +30,7 @@ def verify():
         numeric = result['numeric']
         octave = result['octave']
         
-        status = "✅ PASS" if numeric == expected_num and octave == expected_octave else "❌ FAIL"
+        status = " PASS" if numeric == expected_num and octave == expected_octave else " FAIL"
         if status == "❌ FAIL":
             print(f"{status} | Label: {label:15} | Expected: ({expected_num}, {expected_octave}) | Got: ({numeric}, {octave})")
         else:

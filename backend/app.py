@@ -63,8 +63,8 @@ def enhance_notation(img: np.ndarray) -> np.ndarray:
     # 2. Convert to grayscale for contrast work
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
-    # 3. High-Contrast CLAHE (Smaller tile size for localized contrast)
-    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(4,4))
+    # 3. Balanced CLAHE (Lower clipLimit to prevent blowout)
+    clahe = cv2.createCLAHE(clipLimit=1.5, tileGridSize=(8,8))
     gray = clahe.apply(gray)
     
     # 4. Precision Sharpening (Unsharp Masking)
@@ -118,10 +118,11 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.15):
         detections = post_processor.process(detections)
         
         # Diagnostic Logging
+        raw_labels = [d['label'] for d in detections]
         label_counts = {}
-        for d in detections:
-            label_counts[d['label']] = label_counts.get(d['label'], 0) + 1
-        logger.info(f"--- Detection Results: {label_counts} ---")
+        for l in raw_labels:
+            label_counts[l] = label_counts.get(l, 0) + 1
+        logger.info(f"--- RAW Detection Count: {label_counts} ---")
 
     except Exception as e:
         logger.error(f"Detection failed: {e}")
