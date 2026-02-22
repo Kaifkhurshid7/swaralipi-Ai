@@ -44,9 +44,9 @@ def run_detection(image: np.ndarray):
         )
         all_predictions.extend(result.object_prediction_list)
     
-    # We'll let SAHI's post-processing handle individual scale merges, 
-    # but since we combined scales manually, we return the first result object with extended list 
-    # as a simple way to pass it back to app.py
-    final_result = get_sliced_prediction(image, detection_model, slice_height=1000, slice_width=1000)
-    final_result.object_prediction_list = all_predictions
-    return final_result
+    # Create a simple class to mimic SAHI result structure for app.py
+    class SimpleResult:
+        def __init__(self, predictions):
+            self.object_prediction_list = predictions
+            
+    return SimpleResult(all_predictions)

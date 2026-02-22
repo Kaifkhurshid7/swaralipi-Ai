@@ -83,6 +83,10 @@ const Result: React.FC = () => {
     const scaleX = imgWidth / dispWidth;
     const scaleY = imgHeight / dispHeight;
 
+    // Target point (center of selection)
+    const px = (sel.x + sel.w / 2) * scaleX;
+    const py = (sel.y + sel.h / 2) * scaleY;
+
     // Selection in image coordinates
     const selImg = {
       x1: sel.x * scaleX,
@@ -91,12 +95,20 @@ const Result: React.FC = () => {
       y2: (sel.y + sel.h) * scaleY
     };
 
-    // Find detection with max overlap
+    // Find detection that contains the point (best for clicks)
+    // Or has max overlap (best for drags)
     let bestMatch: Detection | null = null;
     let maxOverlap = 0;
+    let minArea = Infinity;
 
     data.detections.forEach(det => {
       const [dx1, dy1, dx2, dy2] = det.bbox;
+      const area = (dx2 - dx1) * (dy2 - dy1);
+
+      // Point-in-box check (critical for clicks/small drags)
+      const isInside = px >= dx1 && px <= dx2 && py >= dy1 && py <= dy2;
+
+      // Area overlap check
       const interX1 = Math.max(selImg.x1, dx1);
       const interY1 = Math.max(selImg.y1, dy1);
       const interX2 = Math.min(selImg.x2, dx2);
@@ -106,20 +118,28 @@ const Result: React.FC = () => {
       const interHeight = Math.max(0, interY2 - interY1);
       const overlap = interWidth * interHeight;
 
-      if (overlap > maxOverlap) {
+      // Logic: 
+      // 1. If we are inside a box, and it's smaller than the current bestMatch, pick it.
+      // 2. OR if overlap is significantly higher, pick it.
+      if (isInside) {
+        if (area < minArea) {
+          minArea = area;
+          bestMatch = det;
+        }
+      } else if (overlap > maxOverlap && minArea === Infinity) {
         maxOverlap = overlap;
         bestMatch = det;
       }
     });
 
-    if (maxOverlap > 0 && bestMatch) {
-      setActiveDetection({ ...bestMatch, score: 0.90 }); // Hardcode to 90% as requested
+    if (bestMatch) {
+      setActiveDetection({ ...bestMatch }); // Show exact accuracy
     } else {
       setActiveDetection({
         label: 'None',
         english_name: 'Not Detected',
         symbol: '?',
-        score: 0.90, // Still show 90% bar
+        score: 0,
         bbox: [],
         numeric: null
       });
@@ -199,36 +219,34 @@ const Result: React.FC = () => {
               </div>
             )}
 
-            {/* Snow Glass Tooltip - Follows Cursor */}
+            {/* Snow Glass Tooltip - Compact & Offset to Right */}
             {isDragging.current && activeDetection && (
               <div
-                className="absolute z-50 pointer-events-none bg-white/95 backdrop-blur-2xl border border-zinc-100 p-5 rounded-[2.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] transition-all duration-75"
+                className="absolute z-50 pointer-events-none bg-white/95 backdrop-blur-2xl border border-zinc-100 p-3 rounded-[1.5rem] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] transition-all duration-75"
                 style={{
-                  left: mousePos.x,
-                  top: mousePos.y - 20,
-                  transform: 'translate(-50%, -100%)'
+                  left: mousePos.x + 20,
+                  top: mousePos.y - 12,
+                  transform: 'translate(0, -50%)'
                 }}
               >
-                <div className="flex items-center gap-5">
-                  <div className="w-16 h-16 bg-zinc-50 rounded-2xl flex items-center justify-center text-4xl font-black italic border border-zinc-50 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 bg-zinc-50 rounded-xl flex items-center justify-center text-xl font-black italic border border-zinc-50 shadow-sm">
                     {activeDetection.symbol}
                   </div>
-                  <div className="pr-4">
-                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-zinc-300 mb-1">Detected Swara</p>
-                    <p className="text-xl font-black uppercase italic tracking-tighter whitespace-nowrap leading-none mb-3">{activeDetection.english_name}</p>
-                    <div className="flex items-center gap-3">
-                      <div className="w-24 h-2 bg-zinc-100 rounded-full overflow-hidden">
+                  <div className="pr-2">
+                    <p className="text-[7px] font-black uppercase tracking-[0.2em] text-zinc-300 mb-0.5 whitespace-nowrap">Neural Feedback</p>
+                    <p className="text-sm font-black uppercase italic tracking-tighter whitespace-nowrap leading-none mb-1.5">{activeDetection.english_name}</p>
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-black transition-all duration-700 ease-out"
                           style={{ width: `${activeDetection.score * 100}%` }}
                         />
                       </div>
-                      <p className="text-[11px] font-black italic tracking-tighter text-zinc-400">{(activeDetection.score * 100).toFixed(0)}% Acc</p>
+                      <p className="text-[9px] font-black italic tracking-tighter text-zinc-400">{(activeDetection.score * 100).toFixed(0)}%</p>
                     </div>
                   </div>
                 </div>
-                {/* Arrow */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-white/95"></div>
               </div>
             )}
           </div>

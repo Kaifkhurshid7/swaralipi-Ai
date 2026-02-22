@@ -2,7 +2,7 @@ import numpy as np
 from typing import List, Dict
 
 class PostProcessor:
-    def __init__(self, confidence_threshold: float = 0.45, iou_threshold: float = 0.4):
+    def __init__(self, confidence_threshold: float = 0.45, iou_threshold: float = 0.45):
         self.confidence_threshold = confidence_threshold
         self.iou_threshold = iou_threshold
 
@@ -13,17 +13,10 @@ class PostProcessor:
         # 1. Base Filter (Confidence + Geometric)
         filtered = []
         for d in detections:
-            x1, y1, x2, y2 = d['bbox']
-            w, h = x2 - x1, y2 - y1
-            
             # Confidence floor
             if d['score'] < self.confidence_threshold:
                 continue
             
-            # Filter extremely elongated boxes (likely lyrics or bar lines)
-            if w > h * 3 or h > w * 3:
-                continue
-                
             filtered.append(d)
         
         if not filtered:
@@ -53,7 +46,7 @@ class PostProcessor:
             # Refined overlap handling: 
             # If two boxes overlap heavily (>0.5), remove the weaker one.
             # If they overlap slightly, they might be adjacent swaras - keep both.
-            dets = [d for d in dets if self._calculate_iou(best['bbox'], d['bbox']) < 0.45]
+            dets = [d for d in dets if self._calculate_iou(best['bbox'], d['bbox']) < self.iou_threshold]
             
         return keep
 

@@ -17,7 +17,8 @@ from inference.detector import run_detection
 from inference.post_process import PostProcessor
 
 # Initialize post-processor
-post_processor = PostProcessor(confidence_threshold=0.45, iou_threshold=0.4)
+# Initialize post-processor with lower threshold for "90% accuracy" mission
+post_processor = PostProcessor(confidence_threshold=0.15, iou_threshold=0.5)
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -115,6 +116,12 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.15):
         
         # Minimal post-processing (just overlap removal)
         detections = post_processor.process(detections)
+        
+        # Diagnostic Logging
+        label_counts = {}
+        for d in detections:
+            label_counts[d['label']] = label_counts.get(d['label'], 0) + 1
+        logger.info(f"--- Detection Results: {label_counts} ---")
 
     except Exception as e:
         logger.error(f"Detection failed: {e}")
