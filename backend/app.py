@@ -89,7 +89,7 @@ def health():
 
 
 @app.post('/detect', response_model=DetectResponse)
-async def detect(file: UploadFile = File(...), confidence: float = 0.3):
+async def detect(file: UploadFile = File(...), confidence: float = 0.15):
     content = await file.read()
     try:
         # Decode image
@@ -101,10 +101,10 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
         # Apply Clear-Ink Filter
         enhanced_img = enhance_notation(img)
 
-        # Run SAHI detection
+        # Run detection
         result = run_detection(enhanced_img)
         
-        # Convert SAHI result to expected format
+        # Convert result to expected format
         detections = []
         for pred in result.object_prediction_list:
             detections.append({
@@ -113,7 +113,7 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
                 'bbox': [int(pred.bbox.minx), int(pred.bbox.miny), int(pred.bbox.maxx), int(pred.bbox.maxy)]
             })
         
-        # Use the robust post-processor
+        # Minimal post-processing (just overlap removal)
         detections = post_processor.process(detections)
 
     except Exception as e:
@@ -136,7 +136,8 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
         )
         det_objs.append(det)
 
-    ordered_labels = [d.label for d in det_objs if d.numeric != -1]
+    # Simplified sequence logic
+    ordered_labels = [d.label for d in det_objs]
     numeric_sequence = [d.numeric for d in det_objs if d.numeric != -1]
     overall_confidence = float(sum(d.score for d in det_objs) / len(det_objs)) if det_objs else 0.0
 
@@ -147,14 +148,13 @@ async def detect(file: UploadFile = File(...), confidence: float = 0.3):
         numeric_sequence=numeric_sequence, 
         overall_confidence=overall_confidence,
         timestamp=datetime.utcnow().isoformat() + 'Z',
-        model_info="YOLOv8-Swaralipi-Detector"
+        model_info="YOLOv8-Swaralipi-Direct"
     )
 
     # persist
     try:
         save_scan(response.model_dump())
     except Exception:
-        # non-fatal
         pass
 
     return response

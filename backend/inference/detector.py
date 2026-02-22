@@ -13,13 +13,13 @@ if hasattr(torch, 'load'):
         return original_load(*args, **kwargs)
     torch.load = patched_load
 
-# Absolute path to best_new.pt
-MODEL_PATH = Path(__file__).resolve().parents[1] / "models" / "best_new.pt"
+# Absolute path to brain.pt
+MODEL_PATH = Path(__file__).resolve().parents[1] / "models" / "brain.pt"
 
 # Load YOLOv8 model with SAHI
 detection_model = UltralyticsDetectionModel(
     model_path=str(MODEL_PATH),
-    confidence_threshold=0.3,
+    confidence_threshold=0.15,
     device="cpu"   # change to "cuda" if GPU is available
 )
 

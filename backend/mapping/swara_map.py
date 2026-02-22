@@ -14,66 +14,36 @@ SWARA_TO_SEMITONE = {
 }
 
 # Mapping of model labels to (English Description, Hindi Symbol)
+# Order: ['Dha', 'Dha♭ (Komal Dha)', 'Ga', 'Ga♭ (Komal Ga)', 'Ma', 'Ma♯ (Tivra Ma)', 'Ni', 'Ni♭ (Komal Ni)', 'Pa', 'Re', 'Re♭ (Komal Re)', 'Sa']
 SWARA_DETAILS = {
-    "Dha(dot above)": ("Dha (Dot Above)", "ध̇"),
-    "Dha(dot below)": ("Dha (Dot Below)", "ध̣"),
-    "Dha(no dot)": ("Dha (No Dot)", "ध"),
-    "Ga(dot above)": ("Ga (Dot Above)", "ग̇"),
-    "Ga(dot below)": ("Ga (Dot Below)", "ग̣"),
-    "Ga(no dot)": ("Ga (No Dot)", "ग"),
-    "Ga1(dot above)": ("Ga (Komal, Dot Above)", "ग॒̇"),
-    "Handwriting": ("Handwriting", "✍"),
-    "Ma(dot above)": ("Ma (Dot Above)", "म̇"),
-    "Ma(no dot)": ("Ma (No Dot)", "म"),
-    "Ma2(dot above)": ("Ma (Teevra, Dot Above)", "म॑̇"),
-    "Ma2(dot below)": ("Ma (Teevra, Dot Below)", "म̣॑"),
-    "Ma2(no dot)": ("Ma (Teevra, No Dot)", "म॑"),
-    "Ni(dot below)": ("Ni (Dot Below)", "नि̣"),
-    "Ni(no dot)": ("Ni (No Dot)", "नि"),
-    "Ni1(dot below)": ("Ni (Komal, Dot Below)", "नि॒̣"),
-    "Ni1(no dot)": ("Ni (Komal, No Dot)", "नि॒"),
-    "Pa(dot above)": ("Pa (Dot Above)", "प̇"),
-    "Pa(dot below)": ("Pa (Dot Below)", "प̣"),
-    "Pa(no dot)": ("Pa (No Dot)", "प"),
-    "Re(dot above)": ("Re (Dot Above)", "रे̇"),
-    "Re(no dot)": ("Re (No Dot)", "रे"),
-    "Re1(dot above)": ("Re (Komal, Dot Above)", "रे॒̇"),
-    "Re1(no dot)": ("Re (Komal, No Dot)", "रे॒"),
-    "Sa(dot above)": ("Sa (Dot Above)", "स̇"),
-    "Sa(no dot)": ("Sa (No Dot)", "स"),
+    'Dha': ("Dha", "ध"),
+    'Dha♭ (Komal Dha)': ("Dha (Komal)", "ध॒"),
+    'Ga': ("Ga", "ग"),
+    'Ga♭ (Komal Ga)': ("Ga (Komal)", "ग॒"),
+    'Ma': ("Ma", "म"),
+    'Ma♯ (Tivra Ma)': ("Ma (Tivra)", "म॑"),
+    'Ni': ("Ni", "नि"),
+    'Ni♭ (Komal Ni)': ("Ni (Komal)", "नि॒"),
+    'Pa': ("Pa", "प"),
+    'Re': ("Re", "रे"),
+    'Re♭ (Komal Re)': ("Re (Komal)", "रे॒"),
+    'Sa': ("Sa", "स")
 }
 
 def get_swara_details(label: str):
-    """Returns (English Name, Symbol, Numeric (1-12), Octave)"""
+    """Returns (English Name, Symbol, Numeric (1-12), Octave) - Simplified version"""
+    # Direct lookup from the 12 classes
     details = SWARA_DETAILS.get(label, (label, label))
     
-    # Extract base note (e.g., 'Sa', 'Re1', 'Ma2')
-    import re
-    # We want to keep the digit if it's 1 or 2 as part of the base note name for semitone lookup
-    match = re.match(r'^([A-Za-z]+[12]?)', label)
-    if match:
-        base_label = match.group(1).lower()
-    else:
-        base_label = label.lower()
-        
-    num = SWARA_TO_SEMITONE.get(base_label, -1)
+    # Optional: Keep some numeric/octave info if it can be inferred, 
+    # but the user asked to "dont do any matching and all".
+    # I'll provide basic placeholders to avoid breaking app.py
     
-    # 🔹 OCTAVE LOGIC 
-    octave = "Middle"
-    if "(dot above)" in label:
-        octave = "Upper"
-    elif "(dot below)" in label:
-        octave = "Lower"
-    
-    # Handle noise/handwriting
-    if num == -1:
-        octave = None
-
     return {
         "english": details[0],
         "symbol": details[1],
-        "numeric": num,
-        "octave": octave
+        "numeric": -1, # Set to -1 to satisfy existing logic without "matching"
+        "octave": "Natural"
     }
 
 def map_swara_to_num(label: str) -> int:

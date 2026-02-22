@@ -51,12 +51,25 @@ const Scan: React.FC = () => {
     if (!f) return;
     setLoading(true);
     try {
-      const res = await uploadImage(f);
-      sessionStorage.setItem('lastResult', JSON.stringify(res));
-      navigate('/result');
+      // Create a preview for the result page
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Image = reader.result as string;
+        sessionStorage.setItem('lastImage', base64Image);
+
+        try {
+          const res = await uploadImage(f);
+          sessionStorage.setItem('lastResult', JSON.stringify(res));
+          navigate('/result');
+        } catch (err) {
+          alert('Inference Failed: Please verify backend connectivity.');
+        } finally {
+          setLoading(false);
+        }
+      };
+      reader.readAsDataURL(f);
     } catch (err) {
-      alert('Inference Failed: Please verify backend connectivity.');
-    } finally {
+      console.error(err);
       setLoading(false);
     }
   };
